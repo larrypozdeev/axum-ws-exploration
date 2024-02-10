@@ -12,7 +12,6 @@ use futures::StreamExt;
 use std::{collections::HashSet, sync::Arc};
 use tokio::sync::broadcast;
 use tokio::sync::Mutex;
-use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
 struct AppState {
     user_set: Mutex<HashSet<String>>,

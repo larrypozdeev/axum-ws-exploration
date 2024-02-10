@@ -12,6 +12,7 @@
     <input id="username" style="display:block; width:100px; box-sizing: border-box" type="text" placeholder="username">
     <input id="channel" style="display:block; width:100px; box-sizing: border-box" type="text" placeholder="channel">
     <button id="join-chat" type="button">Join Chat</button>
+    <span id="status" style="display:block; width:100px; box-sizing: border-box"></span>
     <textarea id="chat" style="display:block; width:600px; height:400px; box-sizing: border-box" cols="30"
         rows="10"></textarea>
     <input id="input" style="display:block; width:600px; box-sizing: border-box" type="text" placeholder="chat">
@@ -22,6 +23,7 @@
         const join_btn = document.querySelector("#join-chat");
         const textarea = document.querySelector("#chat");
         const input = document.querySelector("#input");
+        const status = document.querySelector("#status");
 
         join_btn.addEventListener("click", function (e) {
             this.disabled = true;
@@ -30,7 +32,7 @@
 
             websocket.onopen = function () {
                 console.log("connection opened");
-                websocket.send(JSON.stringify({ username: username.value, channel: channel.value }));
+                websocket.send(JSON.stringify({username: username.value, channel: channel.value}));
             }
 
             const btn = this;
@@ -42,13 +44,21 @@
 
             websocket.onmessage = function (e) {
                 console.log("received message: " + e.data);
-                textarea.value += e.data + "\r\n";
+                if (e.data.includes("typing")) {
+                    status.innerText = "typing...";
+                } else {
+                    status.innerText = "";
+                    textarea.value += e.data + "\n";
+                }
             }
 
             input.onkeydown = function (e) {
                 if (e.key == "Enter") {
                     websocket.send(input.value);
                     input.value = "";
+                }
+                if (e.key != "Enter") {
+                    websocket.send(JSON.stringify({status: "typing"}));
                 }
             }
         });
